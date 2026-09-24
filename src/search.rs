@@ -36,6 +36,13 @@ fn fuzzy_score(query: &str, candidate: &str) -> Option<i32> {
     Some(score)
 }
 
+fn service_score(query: &str, service: &Service) -> Option<i32> {
+    fuzzy_score(
+        query,
+        &format!("{} {} {}", service.name, service.group, service.description),
+    )
+}
+
 fn open_search(open: RwSignal<bool>, query: RwSignal<String>, selected: RwSignal<usize>) {
     open.set(true);
     query.set(String::new());
@@ -75,8 +82,7 @@ pub fn QuickSearch(services: Vec<Service>) -> impl IntoView {
             let mut ranked: Vec<_> = services
                 .iter()
                 .filter_map(|service| {
-                    fuzzy_score(&text, &format!("{} {}", service.name, service.group))
-                        .map(|score| (score, service.clone()))
+                    service_score(&text, service).map(|score| (score, service.clone()))
                 })
                 .collect();
             ranked.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.name.cmp(&b.1.name)));
@@ -276,12 +282,33 @@ mod browser {
 
 #[cfg(test)]
 mod tests {
-    use super::fuzzy_score;
+    use super::{fuzzy_score, service_score};
+    use crate::Service;
 
     #[test]
     fn ranks_contiguous_matches_first() {
         assert!(fuzzy_score("jf", "Jellyfin").is_some());
         assert!(fuzzy_score("son", "Sonarr") > fuzzy_score("son", "Service One"));
         assert_eq!(fuzzy_score("xyz", "Sonarr"), None);
+    }
+
+    #[test]
+    fn matches_service_name_group_and_description() {
+        let mut service = Service {
+            name: "Jellyfin".into(),
+            group: "Media".into(),
+            description: "Watch movies and television".into(),
+            url: "https://example.com".into(),
+        };
+        for query in ["jf", "media", "MOVIES", "wtch", "television"] {
+            assert!(service_score(query, &service).is_some(), "{query}");
+        }
+        assert_eq!(service_score("xyz", &service), None);
+
+        service.description.clear();
+        assert_eq!(service_score("movies", &service), None);
+        assert!(service_score("jf", &service).is_some());
+        assert!(service_score("media", &service).is_some());
+        assert_eq!(service_score("", &service), Some(0));
     }
 }
