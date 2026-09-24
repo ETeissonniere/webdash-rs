@@ -2,10 +2,10 @@ use super::{
     docker::{self, DockerClient},
     logo,
 };
-use home_ui::Service;
 use leptos::prelude::LeptosOptions;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
+use webdash_rs::Service;
 
 pub struct App {
     docker: DockerClient,

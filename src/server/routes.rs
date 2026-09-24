@@ -11,7 +11,10 @@ async fn index(State(app): State<Arc<App>>) -> impl IntoResponse {
     let services = app.services().await;
     (
         [(header::CACHE_CONTROL, "no-cache")],
-        Html(home_ui::render_page(&services, app.leptos_options.clone())),
+        Html(webdash_rs::render_page(
+            &services,
+            app.leptos_options.clone(),
+        )),
     )
 }
 

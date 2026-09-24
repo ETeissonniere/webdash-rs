@@ -1,9 +1,11 @@
 #[cfg(feature = "ssr")]
 mod page;
 
-use serde::Deserialize;
+mod search;
 
-#[derive(Clone, Deserialize, PartialEq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Deserialize, Serialize, PartialEq)]
 pub struct Service {
     pub name: String,
     pub url: String,
@@ -17,7 +19,6 @@ pub fn default_group() -> String {
     "Services".into()
 }
 
-#[cfg(feature = "ssr")]
 impl Service {
     pub fn logo_path(&self) -> String {
         use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
@@ -27,10 +28,6 @@ impl Service {
 
 #[cfg(feature = "ssr")]
 pub use page::render_page;
-
-#[cfg(feature = "hydrate")]
-#[allow(unused_imports)]
-use quick_search;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]

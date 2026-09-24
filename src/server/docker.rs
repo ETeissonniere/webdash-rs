@@ -1,10 +1,10 @@
-use home_ui::{default_group, Service};
 use reqwest::Client;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::time::Duration;
 use url::Url;
+use webdash_rs::{default_group, Service};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]

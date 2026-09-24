@@ -8,8 +8,9 @@ RUN rustup target add wasm32-unknown-unknown \
 
 WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
-COPY services/ services/
-COPY crates/ crates/
+COPY src/ src/
+COPY assets/ assets/
+COPY style.css ./
 
 RUN cargo leptos build --release
 
@@ -18,15 +19,15 @@ RUN cargo leptos build --release
 # and thus greatly simplify but also limit our runtime environment.
 FROM scratch
 
-COPY --from=build /src/target/release/dashboard /dashboard
+COPY --from=build /src/target/release/webdash-rs /webdash-rs
 COPY --from=build /src/target/site /site
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 ENV LEPTOS_SITE_ROOT=/site \
     LEPTOS_SITE_PKG_DIR=pkg \
-    LEPTOS_OUTPUT_NAME=dashboard \
+    LEPTOS_OUTPUT_NAME=webdash-rs \
     DASHBOARD_LISTEN=0.0.0.0:3000 \
     SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 EXPOSE 3000
-ENTRYPOINT ["/dashboard"]
+ENTRYPOINT ["/webdash-rs"]

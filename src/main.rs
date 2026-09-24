@@ -1,11 +1,11 @@
 mod server;
 
-use home_ui::Service;
 use leptos::prelude::get_configuration;
 use server::App;
 use std::env;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use webdash_rs::Service;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,8 +1,8 @@
 use crate::Service;
 
 pub fn render_page(services: &[Service], options: leptos::prelude::LeptosOptions) -> String {
+    use crate::search::QuickSearch;
     use leptos::prelude::*;
-    use quick_search::{QuickSearch, SearchService};
     use std::collections::BTreeMap;
 
     let mut groups: BTreeMap<&str, Vec<&Service>> = BTreeMap::new();
@@ -67,15 +67,6 @@ pub fn render_page(services: &[Service], options: leptos::prelude::LeptosOptions
         })
         .collect_view();
 
-    let search_services = services
-        .iter()
-        .map(|service| SearchService {
-            name: service.name.clone(),
-            group: service.group.clone(),
-            url: service.url.clone(),
-            logo: service.logo_path(),
-        })
-        .collect();
     view! {
         <!DOCTYPE html>
         <html lang="en">
@@ -85,7 +76,7 @@ pub fn render_page(services: &[Service], options: leptos::prelude::LeptosOptions
                 <meta name="color-scheme" content="light"/>
                 <title>"Service directory"</title>
                 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-                <link rel="stylesheet" href="/pkg/dashboard.css"/>
+                <link rel="stylesheet" href="/pkg/webdash-rs.css"/>
                 <HydrationScripts options islands=true/>
             </head>
             <body>
@@ -95,7 +86,7 @@ pub fn render_page(services: &[Service], options: leptos::prelude::LeptosOptions
                             <h1>"Service directory"</h1>
                             <p class="intro">{summary}</p>
                         </div>
-                        <QuickSearch services=search_services/>
+                        <QuickSearch services=services.to_vec()/>
                     </header>
                     {services.is_empty().then(|| view! {
                         <p class="empty">

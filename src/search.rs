@@ -1,21 +1,13 @@
+use crate::Service;
 use leptos::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use wasm_bindgen::JsCast;
 #[cfg(target_arch = "wasm32")]
 use web_sys::{Element, HtmlInputElement};
 use web_sys::{HtmlImageElement, KeyboardEvent};
 
-#[derive(Clone, PartialEq, Serialize, Deserialize)]
-pub struct SearchService {
-    pub name: String,
-    pub group: String,
-    pub url: String,
-    pub logo: String,
-}
-
 /// Scores an in-order character match, favoring word starts and consecutive letters.
-pub fn fuzzy_score(query: &str, candidate: &str) -> Option<i32> {
+fn fuzzy_score(query: &str, candidate: &str) -> Option<i32> {
     let query: Vec<char> = query
         .to_lowercase()
         .chars()
@@ -51,7 +43,7 @@ fn open_search(open: RwSignal<bool>, query: RwSignal<String>, selected: RwSignal
 }
 
 #[island]
-pub fn QuickSearch(services: Vec<SearchService>) -> impl IntoView {
+pub fn QuickSearch(services: Vec<Service>) -> impl IntoView {
     let open = RwSignal::new(false);
     let query = RwSignal::new(String::new());
     let selected = RwSignal::new(0usize);
@@ -78,7 +70,7 @@ pub fn QuickSearch(services: Vec<SearchService>) -> impl IntoView {
 
     let ranked = Memo::new({
         let services = services.clone();
-        move |_: Option<&Vec<SearchService>>| {
+        move |_: Option<&Vec<Service>>| {
             let text = query.get();
             let mut ranked: Vec<_> = services
                 .iter()
@@ -180,12 +172,12 @@ pub fn QuickSearch(services: Vec<SearchService>) -> impl IntoView {
                                         } else {
                                             "search-result"
                                         }
-                                        href=service.url
+                                        href=service.url.clone()
                                     >
                                         <span class="search-icon">
                                             <span>{initial}</span>
                                             <img
-                                                src=service.logo
+                                                src=service.logo_path()
                                                 alt=""
                                                 on:error=move |event| {
                                                     if let Some(image) = event

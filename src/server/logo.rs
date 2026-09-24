@@ -19,7 +19,7 @@ pub fn client() -> Result<Client, reqwest::Error> {
     Client::builder()
         .timeout(Duration::from_secs(5))
         .redirect(reqwest::redirect::Policy::limited(4))
-        .user_agent("home-services-dashboard/0.1")
+        .user_agent("webdash-rs/0.1")
         .build()
 }
 
