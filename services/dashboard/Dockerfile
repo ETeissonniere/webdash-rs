@@ -3,15 +3,15 @@
 FROM rust:1-alpine AS build
 
 RUN apk add --no-cache build-base pkgconf openssl-dev ca-certificates perl
-WORKDIR /src
+RUN rustup target add wasm32-unknown-unknown \
+    && cargo install cargo-leptos --locked
 
+WORKDIR /src
 COPY Cargo.toml Cargo.lock ./
 COPY services/ services/
 COPY crates/ crates/
 
-RUN rustup target add wasm32-unknown-unknown \
-    && cargo install cargo-leptos --locked \
-    && cargo leptos build --release
+RUN cargo leptos build --release
 
 
 # We build static rust binaries which allow us to use a scratch runtime base
