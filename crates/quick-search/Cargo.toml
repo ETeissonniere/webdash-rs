@@ -1,0 +1,14 @@
+[package]
+name = "quick-search"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+ssr = ["leptos/ssr"]
+hydrate = ["leptos/hydrate"]
+
+[dependencies]
+leptos.workspace = true
+serde.workspace = true
+wasm-bindgen.workspace = true
+web-sys.workspace = true
