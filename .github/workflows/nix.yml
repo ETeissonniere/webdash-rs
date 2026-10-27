@@ -1,0 +1,23 @@
+name: Nix
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Build and test
+        uses: docker://nixos/nix:2.34.9
+        with:
+          entrypoint: nix
+          args: --extra-experimental-features "nix-command flakes" flake check path:. --no-update-lock-file --print-build-logs

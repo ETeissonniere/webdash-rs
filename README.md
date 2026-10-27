@@ -43,6 +43,34 @@ cargo leptos watch
 
 For a release build, run `cargo leptos build --release`.
 
+With Nix, enable `nix-command` and `flakes` in your Nix configuration. The flake
+supports Linux on x86-64 and ARM64, and macOS on Apple Silicon. It provides the
+Rust and WebAssembly build tools from the Nixpkgs revision pinned in `flake.lock`.
+
+Start the development server from the repository root:
+
+```sh
+nix develop --command cargo leptos watch
+```
+
+Use `nix develop` to enter an interactive development shell with Cargo, Clippy,
+and rustfmt. Build or run the release package, including its frontend assets:
+
+```sh
+nix build
+nix run
+```
+
+`nix build` puts the package at `./result`; its executable is
+`./result/bin/webdash-rs`. To build and run the Rust tests, use:
+
+```sh
+nix flake check --no-update-lock-file --print-build-logs
+```
+
+The Nix GitHub Actions workflow runs this check on x86-64 Linux for pull requests
+and pushes to `master`.
+
 Open `http://localhost:3000`. Set `DASHBOARD_LISTEN` to change the address.
 Service changes appear on the next page load. Docker socket access grants broad
 host control even with a read-only mount, so restrict access to the dashboard.
