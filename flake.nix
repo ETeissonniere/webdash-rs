@@ -79,6 +79,45 @@
         };
     in
     {
+      nixosModules.default =
+        {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
+        let
+          cfg = config.services.webdash;
+        in
+        {
+          options.services.webdash = {
+            enable = lib.mkEnableOption "the webdash dashboard";
+            package = lib.mkOption {
+              type = lib.types.package;
+              default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              defaultText = lib.literalExpression "webdash.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+              description = "The webdash package to run.";
+            };
+          };
+
+          config = lib.mkIf cfg.enable {
+            systemd.services.webdash = {
+              description = "Webdash dashboard";
+              wantedBy = [ "multi-user.target" ];
+              serviceConfig = {
+                ExecStart = lib.getExe cfg.package;
+                DynamicUser = true;
+                AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+                CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
+                Restart = "on-failure";
+                NoNewPrivileges = true;
+                PrivateTmp = true;
+                ProtectHome = true;
+                ProtectSystem = "strict";
+              };
+            };
+          };
+        };
       packages = forAllSystems (system: {
         default = (perSystem system).package;
       });
